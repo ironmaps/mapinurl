@@ -1,0 +1,20 @@
+main {
+    max-width: 38rem;
+    padding: 2rem;
+    margin: auto;
+}
+
+.wrapper {
+    text-align: center;
+    list-style-position: inside;
+
+}
+
+textarea {
+    font-size: 15px !important;
+}
+
+.link-container {
+    margin: 10px 0px 10px 0px;
+}
+

@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>mapinurl</title>
+    <link rel="shortcut icon" href="images/icon.jpg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <meta charset="utf-8">
+    <link rel="stylesheet" type="text/css" href="css/style.css">
+    <link rel="stylesheet" type="text/css" href="css/leaflet.css">
+    <link rel="stylesheet" type="text/css" href="css/ld-1.0.4.css">
+    <script type="text/javascript" src="scripts/leaflet.js"></script>
+    <script type="text/javascript" src="scripts/ld-1.0.4.js"></script>
+
+    <!-- bootstrap dep -->
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@3.4.1/dist/css/bootstrap.min.css"
+        integrity="sha384-HSMxcRTRxnN+Bdg0JdbxYKrThecOKuH5zCYotlSAcp1+c8xmyTe9GYg1l9a69psu" crossorigin="anonymous">
+
+</head>
+
+<body>
+    <div class="wrapper row container-fluid">
+        <h3>Map In URL</h3>
+        <div class="link-container"><a href="/index.html">link to tool</a></div>
+        <div class="col-md-offset-3 col-md-6 about-container">
+            <h4>Why mapinurl?</h4>
+            <p>Many a times, I've wished to share some location data with friends/family and other tools on the internet
+                are too <i>extravagant</i> for tiny personal usecases.</p>
+            <p>With "mapinurl", your data stays with you (literally in the URL), and eventually with people and machines you share this URL with.</p>
+            <p>Currently it supports only data generated in the webpage, since it's not <i>meant</i> to be used to work with a 100MB GeoJSON. :) But I'll add some support soon.</p>
+            <p>Of course, like everything this has its own <b>drawbacks</b>. Since the link contains the actual data, they are very long.</p>
+            <h4>How to use?</h4>
+            <ul>
+                <li>
+                    Draw shapes, and add notes to shapes by clicking on them.
+                </li>
+                <li>Use the toolbar on the left to select shapes while drawing</li>
+                <li>Edit notes. Edit/delete geometries.</li>
+                <li>The link displayed in the bottom and <code>Copy link to Map</code> button can be used to get a shareable link to this map.</li>
+                <li>Please refer to the screencast video below to see it in use.</li>
+            </ul>
+        </div>
+    </div>
+
+</body>
+
+</html>
