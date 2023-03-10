@@ -18,6 +18,8 @@
 	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@3.4.1/dist/css/bootstrap.min.css"
 		integrity="sha384-HSMxcRTRxnN+Bdg0JdbxYKrThecOKuH5zCYotlSAcp1+c8xmyTe9GYg1l9a69psu" crossorigin="anonymous">
 
+	<script src="https://cdn.jsdelivr.net/npm/clipboard@2.0.10/dist/clipboard.min.js"></script>
+
 </head>
 
 <body>
@@ -29,9 +31,12 @@
 		</div>
 		<div class="link-container col-md-6 col-md-offset-3">
 
-			<button id="copyMapLink">Copy Link to Map</button>
-			<a id="createdMapLink" href="#">Map Link</a>
-        </div>
+			<button id="copyMapLink" class="copyBtn" data-clipboard-text="">Copy Link to Map</button>
+			<div></div>
+			<div>
+				<a id="createdMapLink" href="#">Map Link</a>
+			</div>
+		</div>
 	</div>
 
 

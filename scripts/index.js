@@ -43,7 +43,7 @@ let drawnItems = geodataValue ? L.geoJSON(geodataValue, {
     }
 }).addTo(map) : L.featureGroup().addTo(map);
 
-if(geodataValue) {
+if (geodataValue) {
     map.fitBounds(drawnItems.getBounds())
 }
 
@@ -98,7 +98,8 @@ map.on(L.Draw.Event.CREATED, function (event) {
     drawnItems.addLayer(layer);
     // add popup for note
     addPopup(layer);
-    // update window url without reloading
+    // update map link
+    updateLink();
 });
 
 // Object(s) edited - update popups
@@ -107,7 +108,8 @@ map.on(L.Draw.Event.EDITED, function (event) {
     layers.eachLayer(function (layer) {
         console.log(layer);
     });
-    // update window url without reloading
+    // update Map Link
+    updateLink();
 });
 
 const uuidv4 = () => {
@@ -127,9 +129,29 @@ const updateLink = () => {
     url.searchParams.set('geodata', drawnItemsGeoJSON);
 
     // set map link href
-    document.getElementById("createdMapLink").setAttribute("href", url.toString())
+    document.getElementById("createdMapLink").setAttribute("href", url.toString());
+    document.getElementById("copyMapLink").setAttribute("data-clipboard-text", url.toString());
 }
 
 document.getElementById("copyMapLink").onclick = () => {
     updateLink();
+    // get link
+    const linkToUpdatedMap = document.getElementById("createdMapLink").getAttribute("href");
+    // copy to clipboard
+    try{
+
+    } catch(err) {
+        
+    }
+
 }
+
+// updateLink for the first time when page loads
+updateLink();
+
+
+
+
+// utils from clipboardJS
+
+new ClipboardJS('.copyBtn');
