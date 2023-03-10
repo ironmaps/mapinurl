@@ -1,8 +1,31 @@
-var osmUrl = 'http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+const params = new Proxy(new URLSearchParams(window.location.search), {
+    get: (searchParams, prop) => searchParams.get(prop),
+});
+
+let geodataValue = null;
+if (params.geodata) {
+    geodataValue = JSON.parse(params.geodata);
+}
+
+let osmUrl = 'http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
     osmAttrib = '&copy; <a href="http://openstreetmap.org/copyright">OpenStreetMap</a> contributors',
     osm = L.tileLayer(osmUrl, { maxZoom: 18, attribution: osmAttrib }),
-    map = new L.Map('map', { center: new L.LatLng(29.9792, 31.1344), zoom: 15 }),
-    drawnItems = L.featureGroup().addTo(map);
+    map = new L.Map('map', { center: new L.LatLng(29.9792, 31.1344), zoom: 15 });
+let drawnItems = geodataValue ? L.geoJSON(geodataValue, {
+    pointToLayer: (feature, latlon) => {
+        // layer instanceof can't be used here since the information is lost on conversion to geojson
+        const markerType = feature.properties?.markerOptions?.type;
+        if (markerType === "marker") {
+            return L.marker(latlon);
+        } else if (markerType === "circleMarker") {
+            return L.circleMarker(latlon, feature.properties.markerOptions);
+        } else if (markerType === "circle") {
+            return L.circle(latlon, feature.properties.markerOptions);
+        } else {
+            return null
+        }
+    }
+}).addTo(map) : L.featureGroup().addTo(map);
 
 L.control.layers({
     "osm": osm.addTo(map),
@@ -26,66 +49,60 @@ map.addControl(new L.Control.Draw({
     }
 }));
 
-// Truncate value based on number of decimals
-var _round = function (num, len) {
-    return Math.round(num * (Math.pow(10, len))) / (Math.pow(10, len));
-};
-// Helper method to format LatLng object (x.xxxxxx, y.yyyyyy)
-var strLatLng = function (latlng) {
-    return "(" + _round(latlng.lat, 6) + ", " + _round(latlng.lng, 6) + ")";
-};
-
-// Generate popup content based on layer type
-// - Returns HTML string, or null if unknown object
-var getPopupContent = function (layer) {
-    // Marker - add lat/long
-    if (layer instanceof L.Marker || layer instanceof L.CircleMarker) {
-        return strLatLng(layer.getLatLng());
-        // Circle - lat/long, radius
-    } else if (layer instanceof L.Circle) {
-        var center = layer.getLatLng(),
-            radius = layer.getRadius();
-        return "Center: " + strLatLng(center) + "<br />"
-            + "Radius: " + _round(radius, 2) + " m";
-        // Rectangle/Polygon - area
-    } else if (layer instanceof L.Polygon) {
-        var latlngs = layer._defaultShape ? layer._defaultShape() : layer.getLatLngs(),
-            area = L.GeometryUtil.geodesicArea(latlngs);
-        return "Area: " + L.GeometryUtil.readableArea(area, true);
-        // Polyline - distance
-    } else if (layer instanceof L.Polyline) {
-        var latlngs = layer._defaultShape ? layer._defaultShape() : layer.getLatLngs(),
-            distance = 0;
-        if (latlngs.length < 2) {
-            return "Distance: N/A";
-        } else {
-            for (var i = 0; i < latlngs.length - 1; i++) {
-                distance += latlngs[i].distanceTo(latlngs[i + 1]);
-            }
-            return "Distance: " + _round(distance, 2) + " m";
-        }
+const getMarkerOptions = (layer) => {
+    if (layer instanceof L.Marker) {
+        layer.options.type = "marker";
+        return layer.options
+    }  else if (layer instanceof L.Circle ) {
+        layer.options.type = "circle";
+        return layer.options
+    } else if (layer instanceof L.CircleMarker ) {
+        layer.options.type = "circleMarker";
+        return layer.options
+    }else {
+        return null
     }
-    return null;
-};
+}
 
 // Object created - bind popup to layer, add to feature group
 map.on(L.Draw.Event.CREATED, function (event) {
-    var layer = event.layer;
-    var content = getPopupContent(layer);
-    if (content !== null) {
-        layer.bindPopup(content);
-    }
+    let layer = event.layer;
+    let feature = layer.feature = layer.feature || {};
+    feature.type = feature.type || "Feature";
+    let props = feature.properties = feature.properties || {};
+    props.id = props.id || uuidv4();
+    props.note = props.note || "";
+    // this is filtered here instead of layer.options to not unnecessarily lengthen URL
+    props.markerOptions = getMarkerOptions(layer);
     drawnItems.addLayer(layer);
+    // update window url without reloading
 });
 
 // Object(s) edited - update popups
 map.on(L.Draw.Event.EDITED, function (event) {
-    var layers = event.layers,
-        content = null;
+    let layers = event.layers;
     layers.eachLayer(function (layer) {
-        content = getPopupContent(layer);
-        if (content !== null) {
-            layer.setPopupContent(content);
-        }
+        console.log(layer);
     });
+    // update window url without reloading
 });
+
+const uuidv4 = () => {
+    return ([1e7] + -1e3 + -4e3 + -8e3 + -1e11).replace(/[018]/g, c =>
+        (c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16)
+    );
+}
+
+document.getElementById("createMapLink").onclick = () => {
+    // get all editable features in the map
+    const drawnItemsGeoJSON = JSON.stringify(drawnItems.toGeoJSON());
+    const urlParamJson = new URLSearchParams({
+        geodata: drawnItemsGeoJSON
+    });
+
+    let url = new URL(document.URL);
+    url.searchParams.set('geodata', drawnItemsGeoJSON);
+
+    // set map link href
+    document.getElementById("createdMapLink").setAttribute("href", url.toString())
+}
