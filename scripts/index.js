@@ -4,6 +4,7 @@ const addPopup = (layer) => {
     content.setAttribute("rows", "Write description here")
     content.addEventListener("keyup", function () {
         layer.feature.properties.note = content.value;
+        updateLink();
     });
     layer.on("popupopen", function () {
         content.value = layer.feature.properties.note;
@@ -69,6 +70,8 @@ map.addControl(new L.Control.Draw({
     }
 }));
 
+
+
 const getMarkerOptions = (layer) => {
     if (layer instanceof L.Marker) {
         layer.options.type = "marker";
@@ -103,14 +106,17 @@ map.on(L.Draw.Event.CREATED, function (event) {
 });
 
 // Object(s) edited - update popups
-map.on(L.Draw.Event.EDITED, function (event) {
-    let layers = event.layers;
-    layers.eachLayer(function (layer) {
-        console.log(layer);
-    });
+map.on(L.Draw.Event.EDITED, function (_) {
     // update Map Link
     updateLink();
 });
+
+// objects deleted
+map.on(L.Draw.Event.DELETED, e => {
+    e.layers.eachLayer(layer => {
+       drawnItems.removeLayer(layer);
+    });
+ })
 
 const uuidv4 = () => {
     return ([1e7] + -1e3 + -4e3 + -8e3 + -1e11).replace(/[018]/g, c =>
