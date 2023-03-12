@@ -44,7 +44,7 @@ let drawnItems = geodataValue ? L.geoJSON(geodataValue, {
     }
 }).addTo(map) : L.featureGroup().addTo(map);
 
-if (geodataValue) {
+if (geodataValue && geodataValue.features.length != 0 ) {
     map.fitBounds(drawnItems.getBounds())
 }
 
